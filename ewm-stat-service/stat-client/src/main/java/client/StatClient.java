@@ -1,4 +1,4 @@
-package rest_client;
+package client;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
