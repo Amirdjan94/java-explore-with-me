@@ -20,3 +20,17 @@ target/
 *.iws
 *.iml
 *.ipr
+
+# --- Docker volumes (данные PostgreSQL) ---
+volumes/
+**/volumes/
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Логи ---
+*.log
+
+# --- Docker ---
+*.pid
