@@ -32,7 +32,7 @@ public class EventMapper {
         event.setViews(0L);
         event.setPublishedOn(null);
         event.setCreatedOn(LocalDateTime.now());
-        event.setState(State.CREATED);
+        event.setState(State.PENDING);
         return event;
     }
 

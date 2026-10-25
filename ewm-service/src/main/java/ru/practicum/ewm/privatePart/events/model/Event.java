@@ -23,41 +23,41 @@ public class Event {
     private Long id;
 
     @Column(name = "annotation", length = 2000, nullable = false)
-    private String annotation;
+    private String annotation; // Краткое описание
 
     @Column(name = "confirmed_requests")
-    private Long confirmedRequests;
+    private Long confirmedRequests; // Количество одобренных заявок на участие в данном событии
 
     @Column(name = "description", nullable = false, length = 7000)
-    private String description;
+    private String description; // Полное описание события
 
     @Column(name = "paid")
-    private Boolean paid;
+    private Boolean paid; // Нужно ли оплачивать участие
 
     @Column(name = "participant_limit")
-    private Integer participantLimit;
+    private Integer participantLimit; // Ограничение на количество участников. Значение 0 - означает отсутствие ограничения
 
     @Column(name = "request_moderation")
-    private Boolean requestModeration;
+    private Boolean requestModeration; // Нужна ли пре-модерация заявок на участие
 
     @Column(name = "state")
     @Enumerated(EnumType.STRING)
-    private State state;
+    private State state; // Список состояний жизненного цикла события
 
     @Column(name = "title", nullable = false, length = 120)
-    private String title;
+    private String title; // Заголовок
 
     @Column(name = "views")
-    private Long views;
+    private Long views; // Количество просмотрев события [PENDING, PUBLISHED, CANCELED]
 
     @Column(name = "created_on")
     private LocalDateTime createdOn;
 
     @Column(name = "event_date", nullable = false)
-    private LocalDateTime eventDate;
+    private LocalDateTime eventDate; // Дата и время на которые намечено событие (в формате "yyyy-MM-dd HH:mm:ss")
 
     @Column(name = "published_on")
-    private LocalDateTime publishedOn;
+    private LocalDateTime publishedOn; // Дата и время публикации события (в формате "yyyy-MM-dd HH:mm:ss")
 
     @ManyToOne
     @JoinColumn(name = "initiator_id", nullable = false)

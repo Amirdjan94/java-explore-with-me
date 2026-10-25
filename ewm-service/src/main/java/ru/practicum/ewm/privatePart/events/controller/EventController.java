@@ -28,4 +28,13 @@ public class EventController {
         log.info("Поступил запрос на добавление нового события - {} ", newEventDTO);
         return eventService.createEvent(newEventDTO, userId);
     }
+
+    @GetMapping("/{userId}/events/{eventId}")
+    @ResponseStatus(HttpStatus.OK)
+    public EventFullDTO getEventByUserIdAndEventId(@PathVariable(name = "userId") Long userId,
+                                                   @PathVariable(name = "eventId") Long eventId) {
+        log.info("Поступил запрос на получение информации о событии с ID - {} , пользователя с ID - {}", eventId, userId);
+        return eventService.getEventByUserIdAndEventId(userId, eventId);
+    }
+
 }

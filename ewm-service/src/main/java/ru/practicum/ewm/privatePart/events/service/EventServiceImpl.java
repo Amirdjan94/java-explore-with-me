@@ -45,6 +45,19 @@ public class EventServiceImpl implements EventService {
         return EventMapper.toEventFullDTOFromEventEntity(newEvent);
     }
 
+    @Override
+    public EventFullDTO getEventByUserIdAndEventId(Long userId, Long eventId) {
+        log.info("Проверяем наличие пользователя в БД с ID - {} ", userId);
+        checkUserIdAndGetUserEntity(userId);
+        log.info("Проверяем наличие события в БД с ID - {} ", eventId);
+        Event event = checkEventIdAndGetEventEntity(eventId);
+        if (event.getUser().getId() != userId) {
+            log.warn("События с указанным ID={} и с указанным пользователем userId={} не существует ", eventId, userId);
+            throw new ObjectNotFoundException("Event with id=" + eventId + " was not found");
+        }
+        return EventMapper.toEventFullDTOFromEventEntity(event);
+    }
+
     private User checkUserIdAndGetUserEntity(Long userId) {
         if (userId == null || userId <= 0) {
             throw new ConditionsNotMetException("Incorrect userId");
@@ -68,6 +81,19 @@ public class EventServiceImpl implements EventService {
             throw new ObjectNotFoundException("Category with id=" + categoryId + " was not found");
         }
         return category.get();
+    }
+
+    private Event checkEventIdAndGetEventEntity(Long eventId) {
+        if (eventId == null || eventId <= 0) {
+            log.warn("Не корректное Id события - " + eventId);
+            throw new ConditionsNotMetException("Incorrect event Id");
+        }
+        Optional<Event> event = eventRepository.findById(eventId);
+        if (event.isEmpty()) {
+            log.warn("События с указанным ID - {} не существует ", eventId);
+            throw new ObjectNotFoundException("Event with id=" + eventId + " was not found");
+        }
+        return event.get();
     }
 
 }

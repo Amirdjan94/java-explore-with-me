@@ -44,7 +44,7 @@ public class NewEventDTO {
     @Min(1)
     private Integer participantLimit;
 
-    @JsonProperty(defaultValue = "false")
+    @JsonProperty(defaultValue = "true")
     private Boolean requestModeration;
 
     @NotBlank
