@@ -22,18 +22,18 @@ public class Request {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "created")
+    @Column(name = "created", nullable = false)
     private LocalDateTime created; // Дата и время создания заявки
 
     @ManyToOne
-    @JoinColumn(name = "event_id")
+    @JoinColumn(name = "event_id", nullable = false)
     private Event event; // Идентификатор события
 
     @ManyToOne
-    @JoinColumn(name = "requester_id")
+    @JoinColumn(name = "requester_id", nullable = false)
     private User user;
 
-    @Column(name = "status")
+    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private RequestStatus requestStatus; // Статус заявки
 

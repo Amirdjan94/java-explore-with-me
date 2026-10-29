@@ -1,5 +1,6 @@
 package ru.practicum.ewm.admin.users.service;
 
+import org.springframework.data.domain.Pageable;
 import ru.practicum.ewm.admin.users.dto.NewUserDto;
 import ru.practicum.ewm.admin.users.dto.UserDto;
 
@@ -10,6 +11,6 @@ public interface UserService {
 
     void deleteUserById(Long userId);
 
-    List<UserDto> getUsers(List<Long> ids, Integer from, Integer size);
+    List<UserDto> getUsers(List<Long> ids, Pageable pageable);
 
 }

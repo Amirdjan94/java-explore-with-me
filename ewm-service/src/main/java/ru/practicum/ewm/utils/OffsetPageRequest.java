@@ -1,51 +1,53 @@
 package ru.practicum.ewm.utils;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 
-public class OffsetPageRequest implements Pageable {
-    @Override
-    public Pageable first() {
-        return null;
+import java.util.Optional;
+
+public class OffsetPageRequest extends PageRequest {
+
+    private final int from;
+
+    public OffsetPageRequest(int from, int size, Sort sort) {
+        super(from / size, size, sort);
+        this.from = from;
+    }
+
+    public static OffsetPageRequest of(int from, int size) {
+        return of(from, size, Sort.unsorted());
+    }
+
+    public static OffsetPageRequest of(int from, int size, Sort sort) {
+        return new OffsetPageRequest(from, size, sort);
     }
 
     @Override
-    public int getPageNumber() {
-        return 0;
+    public boolean isPaged() {
+        return super.isPaged();
     }
 
     @Override
-    public int getPageSize() {
-        return 0;
+    public boolean isUnpaged() {
+        return super.isUnpaged();
     }
 
     @Override
-    public long getOffset() {
-        return 0;
+    public Limit toLimit() {
+        return super.toLimit();
     }
 
     @Override
-    public Sort getSort() {
-        return null;
+    public Optional<Pageable> toOptional() {
+        return super.toOptional();
     }
 
     @Override
-    public Pageable next() {
-        return null;
+    public OffsetScrollPosition toScrollPosition() {
+        return super.toScrollPosition();
     }
 
     @Override
-    public Pageable previousOrFirst() {
-        return null;
-    }
-
-    @Override
-    public Pageable withPage(int pageNumber) {
-        return null;
-    }
-
-    @Override
-    public boolean hasPrevious() {
-        return false;
+    public Sort getSortOr(Sort sort) {
+        return super.getSortOr(sort);
     }
 }

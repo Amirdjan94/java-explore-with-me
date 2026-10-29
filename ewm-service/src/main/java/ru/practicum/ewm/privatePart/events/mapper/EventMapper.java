@@ -36,12 +36,12 @@ public class EventMapper {
         return event;
     }
 
-    public static EventFullDTO toEventFullDTOFromEventEntity(Event event) {
+    public static EventFullDTO toEventFullDTOFromEventEntity(Event event, Long confirmedRequestsCount) {
         EventFullDTO eventFullDTO = new EventFullDTO();
         UserShortDto userShortDto = UserMapper.toUserShortDtoFromUserEntity(event.getUser());
         eventFullDTO.setId(event.getId());
         eventFullDTO.setAnnotation(event.getAnnotation());
-        eventFullDTO.setConfirmedRequests(0L);
+        eventFullDTO.setConfirmedRequests(confirmedRequestsCount);
         eventFullDTO.setDescription(event.getDescription());
         eventFullDTO.setPaid(event.getPaid());
         eventFullDTO.setParticipantLimit(event.getParticipantLimit());

@@ -19,9 +19,9 @@ public class RequestMapper {
         request.setEvent(event);
         request.setCreated(LocalDateTime.now());
         if (event.getRequestModeration()) {
-            request.setRequestStatus(RequestStatus.CONFIRMED);
-        } else {
             request.setRequestStatus(RequestStatus.PENDING);
+        } else {
+            request.setRequestStatus(RequestStatus.CONFIRMED);
         }
         return request;
     }
@@ -29,7 +29,7 @@ public class RequestMapper {
     public static ParticipationRequestDto toParticipationRequestDtoFromRequestEntity(Request request) {
         ParticipationRequestDto participationRequestDto = new ParticipationRequestDto();
         participationRequestDto.setId(request.getId());
-        participationRequestDto.setRequestStatus(request.getRequestStatus());
+        participationRequestDto.setStatus(request.getRequestStatus());
         participationRequestDto.setEvent(request.getEvent().getId());
         participationRequestDto.setRequester(request.getUser().getId());
         participationRequestDto.setCreated(request.getCreated());

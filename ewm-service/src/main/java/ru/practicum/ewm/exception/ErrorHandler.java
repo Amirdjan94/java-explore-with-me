@@ -49,4 +49,10 @@ public class ErrorHandler {
         return new ErrorResponse("Incorrect argument in payload.", e.getMessage(), "BAD REQUEST");
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleForbiddenException(final ForbiddenException e) {
+        return new ErrorResponse("The required object was not found.", e.getMessage(), "FORBIDDEN");
+    }
+
 }

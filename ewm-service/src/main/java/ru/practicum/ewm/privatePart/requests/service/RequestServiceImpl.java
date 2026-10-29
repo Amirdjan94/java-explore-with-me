@@ -11,12 +11,15 @@ import ru.practicum.ewm.exception.ObjectNotFoundException;
 import ru.practicum.ewm.privatePart.events.data.State;
 import ru.practicum.ewm.privatePart.events.model.Event;
 import ru.practicum.ewm.privatePart.events.repository.EventRepository;
+import ru.practicum.ewm.privatePart.requests.data.RequestStatus;
 import ru.practicum.ewm.privatePart.requests.dto.ParticipationRequestDto;
 import ru.practicum.ewm.privatePart.requests.mapper.RequestMapper;
 import ru.practicum.ewm.privatePart.requests.model.Request;
 import ru.practicum.ewm.privatePart.requests.repository.RequestRepository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -48,6 +51,33 @@ public class RequestServiceImpl implements RequestService {
         return RequestMapper.toParticipationRequestDtoFromRequestEntity(newRequest);
     }
 
+    @Override
+    public List<ParticipationRequestDto> getParticipationRequestDtoList(Long userId) {
+        log.info("Проверяем наличие пользователя в БД с ID - {} ", userId);
+        checkUserIdAndGetUserEntity(userId);
+        log.info("Запрос в БД для получения списка запросов указанного пользователя");
+        List<Request> requestsList = requestRepository.getRequestListByUserId(userId);
+        return requestsList.stream()
+                .map(RequestMapper::toParticipationRequestDtoFromRequestEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public ParticipationRequestDto canceledRequest(Long userId, Long requestId) {
+        log.info("Проверяем наличие пользователя в БД с ID - {} ", userId);
+        checkUserIdAndGetUserEntity(userId);
+        log.info("Проверяем наличие запроса в БД с ID - {} ", requestId);
+        Request request = checkRequestIdAndGetRequestEntity(requestId);
+        if (!request.getUser().getId().equals(userId)) {
+            log.warn("Указанный запрос относиться к другому пользователю");
+            throw new ObjectNotFoundException("Request with id=" + requestId + " and with requester=" + userId + " was not found");
+        }
+        request.setRequestStatus(RequestStatus.CANCELED);
+        Request newRequest = requestRepository.save(request);
+        log.info("Поменяли статус запроса и сохранили в БД");
+        return RequestMapper.toParticipationRequestDtoFromRequestEntity(newRequest);
+    }
+
     private Event checkEventIdAndGetEventEntity(Long eventId) {
         if (eventId == null || eventId <= 0) {
             log.warn("Не корректное Id события - " + eventId);
@@ -73,6 +103,18 @@ public class RequestServiceImpl implements RequestService {
         return user.get();
     }
 
+    private Request checkRequestIdAndGetRequestEntity(Long requestId) {
+        if (requestId == null || requestId <= 0) {
+            throw new ConditionsNotMetException("Incorrect userId");
+        }
+        Optional<Request> request = requestRepository.findById(requestId);
+        if (request.isEmpty()) {
+            log.warn("Запроса с указанным ID - {} не существует ", requestId);
+            throw new ObjectNotFoundException("Request with id=" + requestId + " was not found");
+        }
+        return request.get();
+    }
+
     private void checkRequestRule(User user, Event event) {
         if (event.getUser().getId().equals(user.getId())) {
             log.warn("Инициатор события не может добавить запрос на участие в своём событии");
@@ -82,7 +124,8 @@ public class RequestServiceImpl implements RequestService {
             log.warn("Нельзя участвовать в неопубликованном событии");
             throw new DataIntegrityViolationException("Cannot participate in an unpublished event.");
         }
-        if (event.getParticipantLimit() != 0 && event.getConfirmedRequests() >= event.getParticipantLimit()) {
+        if (event.getParticipantLimit() != 0 &&
+                requestRepository.getRequestCountByEventIdAndStatus(event.getId(), RequestStatus.CONFIRMED) >= event.getParticipantLimit()) {
             log.warn("Достигнут лимит запросов на участие");
             throw new DataIntegrityViolationException("The limit for participation requests has been reached.");
         }
