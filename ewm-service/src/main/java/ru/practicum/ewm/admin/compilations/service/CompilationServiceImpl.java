@@ -104,7 +104,6 @@ public class CompilationServiceImpl implements CompilationService {
 
         log.info("Собираем список событий");
         List<Event> eventList = compilation.getEvents().stream().toList();
-        Set<Event> eventSet = new HashSet<>(eventList); // Создали Set, набор уникальных событий
 
         log.info("Собираем информацию по запросам на участие в событии и формируем ответ для пользователя");
         List<Long> eventIds = getEventIds(eventList);  // Получили список ID событий

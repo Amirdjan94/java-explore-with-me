@@ -76,7 +76,7 @@ public class EventServiceImpl implements EventService {
         checkUserIdAndGetUserEntity(userId);
         log.info("Проверяем наличие события в БД с ID - {} ", eventId);
         Event event = checkEventIdAndGetEventEntity(eventId);
-        if (event.getUser().getId() != userId) {
+        if (!event.getUser().getId().equals(userId)) {
             log.warn("События с указанным ID={} и с указанным пользователем userId={} не существует ", eventId, userId);
             throw new ObjectNotFoundException("Event with id=" + eventId + " was not found");
         }
@@ -94,7 +94,7 @@ public class EventServiceImpl implements EventService {
         checkUserIdAndGetUserEntity(userId);
         log.info("Проверяем наличие события в БД с ID - {} ", eventId);
         Event event = checkEventIdAndGetEventEntity(eventId);
-        if (event.getUser().getId() != userId) {
+        if (!event.getUser().getId().equals(userId)) {
             log.warn("События с указанным ID={} и с указанным пользователем userId={} не существует ", eventId, userId);
             throw new ObjectNotFoundException("Event with id=" + eventId + " was not found");
         }
@@ -173,7 +173,7 @@ public class EventServiceImpl implements EventService {
         log.info("Проверяем наличие события в БД с ID - {} ", eventId);
         Event event = checkEventIdAndGetEventEntity(eventId);
         log.info("Проверяем относится ли событие к текущему пользователю");
-        if (event.getUser().getId() != userId) {
+        if (!event.getUser().getId().equals(userId)) {
             log.warn("Пользователя с указанным ID - {} не существует ", userId);
             throw new ConditionsNotMetException("Event with id=" + eventId + " was not refer user with id=" + userId);
         }
@@ -191,7 +191,7 @@ public class EventServiceImpl implements EventService {
         log.info("Проверяем наличие события в БД с ID - {} ", eventId);
         Event event = checkEventIdAndGetEventEntity(eventId);
         log.info("Проверяем относится ли событие к текущему пользователю");
-        if (event.getUser().getId() != userId) {
+        if (!event.getUser().getId().equals(userId)) {
             log.warn("Пользователя с указанным ID - {} не существует ", userId);
             throw new ConditionsNotMetException("Event with id=" + eventId + " was not refer user with id=" + userId);
         }
