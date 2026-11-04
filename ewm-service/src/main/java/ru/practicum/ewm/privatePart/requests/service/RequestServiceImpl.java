@@ -129,6 +129,11 @@ public class RequestServiceImpl implements RequestService {
             log.warn("Достигнут лимит запросов на участие");
             throw new DataIntegrityViolationException("The limit for participation requests has been reached.");
         }
+        Optional<Request> request = requestRepository.getRequestByUserIdAndEventId(user.getId(), event.getId());
+        if (request.isPresent()) {
+            log.warn("Добавление повторного запроса от пользователя на участие в событии ЗАПРЕЩЕНО");
+            throw new DataIntegrityViolationException("Submitting a repeat request from a user to participate in an event is PROHIBITED.");
+        }
     }
 
 }

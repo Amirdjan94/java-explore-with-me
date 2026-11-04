@@ -35,7 +35,7 @@ public class UserUpdateEventRequestDto {
     private Boolean paid;
 
     @JsonProperty(defaultValue = "0")
-    @Min(1)
+    @Min(0)
     private Integer participantLimit;
 
     @JsonProperty(defaultValue = "true")

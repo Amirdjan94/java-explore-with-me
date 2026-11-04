@@ -16,8 +16,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     @Query("SELECT e FROM Event e WHERE (:users IS NULL OR e.user.id IN :users) " +
             " AND (:states IS NULL OR e.state IN :states) " +
             " AND (:categories IS NULL OR e.category.id IN :categories) " +
-            " AND e.eventDate >= :rangeStart " +
-            " AND e.eventDate <= :rangeEnd " +
+            " AND (cast(:rangeStart as timestamp) IS NULL OR e.eventDate >= :rangeStart) " +
+            " AND (cast(:rangeEnd as timestamp) IS NULL OR e.eventDate <= :rangeEnd) " +
             " ORDER BY e.eventDate DESC, e.id DESC")
     Page<Event> findByParams(@Param("users") List<Long> users,
                              @Param("states") List<State> states,
@@ -31,4 +31,19 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     Page<Event> findByUserId(@Param("userId") Long userId,
                              PageRequest pageRequest);
 
+    @Query("SELECT e FROM Event e " +
+            " WHERE ((LOWER(e.annotation) LIKE LOWER(CONCAT('%', :text, '%')) OR :text IS NULL ) " +
+            " OR (LOWER(e.description) LIKE LOWER(CONCAT('%', :text, '%')) OR :text IS NULL )) " +
+            " AND (:categories IS NULL OR e.category.id IN :categories) " +
+            " AND (:paid IS NULL OR e.paid IN :paid) " +
+            " AND (cast(:rangeStart as timestamp) IS NULL OR e.eventDate >= :rangeStart) " +
+            " AND (cast(:rangeEnd as timestamp) IS NULL OR e.eventDate <= :rangeEnd) " +
+            " ORDER BY e.eventDate DESC, e.id DESC")
+    Page<Event> findByParamsForUnauthorizationUser(
+            @Param("text") String text,
+            @Param("categories") List<Long> categories,
+            @Param("paid") Boolean paid,
+            @Param("rangeStart") LocalDateTime rangeStart,
+            @Param("rangeEnd") LocalDateTime rangeEnd,
+            PageRequest pageRequest);
 }

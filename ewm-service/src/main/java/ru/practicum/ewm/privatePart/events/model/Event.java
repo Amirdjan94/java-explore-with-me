@@ -25,9 +25,6 @@ public class Event {
     @Column(name = "annotation", length = 2000, nullable = false)
     private String annotation; // Краткое описание
 
-//    @Column(name = "confirmed_requests")
-//    private Long confirmedRequests; // Количество одобренных заявок на участие в данном событии
-
     @Column(name = "description", nullable = false, length = 7000)
     private String description; // Полное описание события
 

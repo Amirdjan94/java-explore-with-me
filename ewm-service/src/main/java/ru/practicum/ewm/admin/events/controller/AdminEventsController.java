@@ -1,5 +1,6 @@
 package ru.practicum.ewm.admin.events.controller;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
@@ -46,7 +47,7 @@ public class AdminEventsController {
 
     @PatchMapping("/{eventId}")
     @ResponseStatus(HttpStatus.OK)
-    public EventFullDTO updateEventByAdmin(@RequestBody AdminUpdateEventRequestDto adminUpdateEventRequestDto,
+    public EventFullDTO updateEventByAdmin(@Valid @RequestBody AdminUpdateEventRequestDto adminUpdateEventRequestDto,
                                            @PathVariable(name = "eventId") Long eventId) {
         log.info("Поступил запрос на обновление события с ИД - {} , на данные - {}", eventId, adminUpdateEventRequestDto);
         return eventService.updateEventByAdmin(adminUpdateEventRequestDto, eventId);

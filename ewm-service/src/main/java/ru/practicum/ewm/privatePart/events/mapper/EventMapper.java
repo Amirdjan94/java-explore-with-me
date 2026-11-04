@@ -8,6 +8,7 @@ import ru.practicum.ewm.admin.users.mapper.UserMapper;
 import ru.practicum.ewm.admin.users.model.User;
 import ru.practicum.ewm.privatePart.events.data.State;
 import ru.practicum.ewm.privatePart.events.dto.EventFullDTO;
+import ru.practicum.ewm.privatePart.events.dto.EventShortDTO;
 import ru.practicum.ewm.privatePart.events.dto.NewEventDTO;
 import ru.practicum.ewm.privatePart.events.model.Event;
 
@@ -36,7 +37,7 @@ public class EventMapper {
         return event;
     }
 
-    public static EventFullDTO toEventFullDTOFromEventEntity(Event event, Long confirmedRequestsCount) {
+    public static EventFullDTO toEventFullDTOFromEventEntity(Event event, Long confirmedRequestsCount, Long viewCount) {
         EventFullDTO eventFullDTO = new EventFullDTO();
         UserShortDto userShortDto = UserMapper.toUserShortDtoFromUserEntity(event.getUser());
         eventFullDTO.setId(event.getId());
@@ -48,7 +49,7 @@ public class EventMapper {
         eventFullDTO.setRequestModeration(event.getRequestModeration());
         eventFullDTO.setState(event.getState());
         eventFullDTO.setTitle(event.getTitle());
-        eventFullDTO.setViews(event.getViews());
+        eventFullDTO.setViews(viewCount);
         eventFullDTO.setCreatedOn(event.getCreatedOn());
         eventFullDTO.setEventDate(event.getEventDate());
         eventFullDTO.setPublishedOn(event.getPublishedOn());
@@ -56,6 +57,21 @@ public class EventMapper {
         eventFullDTO.setCategory(event.getCategory());
         eventFullDTO.setLocation(event.getLocation());
         return eventFullDTO;
+    }
+
+    public static EventShortDTO toEventShortDTOFromEventEntity(Event event, Long confirmedRequestsCount, Long viewCount) {
+        EventShortDTO eventShortDTO = new EventShortDTO();
+        UserShortDto userShortDto = UserMapper.toUserShortDtoFromUserEntity(event.getUser());
+        eventShortDTO.setId(event.getId());
+        eventShortDTO.setAnnotation(event.getAnnotation());
+        eventShortDTO.setConfirmedRequests(confirmedRequestsCount);
+        eventShortDTO.setPaid(event.getPaid());
+        eventShortDTO.setTitle(event.getTitle());
+        eventShortDTO.setViews(viewCount);
+        eventShortDTO.setEventDate(event.getEventDate());
+        eventShortDTO.setInitiator(userShortDto);
+        eventShortDTO.setCategory(event.getCategory());
+        return eventShortDTO;
     }
 
 }

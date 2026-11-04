@@ -2,6 +2,7 @@ package ru.practicum.ewm.admin.category.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.admin.category.dto.CategoryDto;
 import ru.practicum.ewm.admin.category.dto.NewCategoryDto;
@@ -11,8 +12,10 @@ import ru.practicum.ewm.admin.category.repository.CategoryRepository;
 import ru.practicum.ewm.exception.ConditionsNotMetException;
 import ru.practicum.ewm.exception.ObjectNotFoundException;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -34,7 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void deleteCategory(Long categoryId) {
         log.info("Проверяем наличие категории в БД с ID - {} ", categoryId);
-        checkExistCategory(categoryId);
+        checkExistCategoryAndGetCategoryEntity(categoryId);
         categoryRepository.deleteById(categoryId);
         log.info("Удалена категория с ID - {} ", categoryId);
     }
@@ -42,7 +45,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto updateCategory(Long categoryId, Map<String, String> newNameMap) {
         log.info("Проверяем наличие категории в БД с ID - {} ", categoryId);
-        checkExistCategory(categoryId);
+        checkExistCategoryAndGetCategoryEntity(categoryId);
         log.info("Проверяем входные данные - {} ", newNameMap);
         checkNewNameMap(newNameMap);
         Category category = categoryRepository.findById(categoryId).get();
@@ -52,12 +55,26 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryMapper.toCategoryDtoFromCategory(newCategory);
     }
 
-    private void checkExistCategory(Long categoryId) {
+    @Override
+    public List<CategoryDto> getCategoryList(PageRequest pageRequest) {
+        return categoryRepository.findAll(pageRequest).stream().map(CategoryMapper::toCategoryDtoFromCategory)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public CategoryDto getCategoryById(Long categoryId) {
+        log.info("Проверяем наличие категории в БД с ID - {} ", categoryId);
+        Category category = checkExistCategoryAndGetCategoryEntity(categoryId);
+        return CategoryMapper.toCategoryDtoFromCategory(category);
+    }
+
+    private Category checkExistCategoryAndGetCategoryEntity(Long categoryId) {
         Optional<Category> category = categoryRepository.findById(categoryId);
         if (category.isEmpty()) {
             log.warn("Категории с указанным ID - {} не существует ", categoryId);
             throw new ObjectNotFoundException("Category with id=" + categoryId + " was not found");
         }
+        return category.get();
     }
 
     private void checkNewNameMap(Map<String, String> newNameMap) {

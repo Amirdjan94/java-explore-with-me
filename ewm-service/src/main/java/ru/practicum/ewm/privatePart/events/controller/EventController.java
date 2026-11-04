@@ -7,10 +7,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.ewm.privatePart.events.dto.EventFullDTO;
-import ru.practicum.ewm.privatePart.events.dto.NewEventDTO;
-import ru.practicum.ewm.privatePart.events.dto.UserUpdateEventRequestDto;
+import ru.practicum.ewm.privatePart.events.dto.*;
 import ru.practicum.ewm.privatePart.events.service.EventService;
+import ru.practicum.ewm.privatePart.requests.dto.ParticipationRequestDto;
 import ru.practicum.ewm.utils.OffsetPageRequest;
 
 import java.util.List;
@@ -44,9 +43,9 @@ public class EventController {
 
     @GetMapping("/{userId}/events")
     @ResponseStatus(HttpStatus.OK)
-    public List<EventFullDTO> getEventListByUserId(@PathVariable(name = "userId") Long userId,
-                                                   @RequestParam(name = "from", defaultValue = "0", required = false) Integer from,
-                                                   @RequestParam(name = "size", defaultValue = "10", required = false) Integer size) {
+    public List<EventShortDTO> getEventListByUserId(@PathVariable(name = "userId") Long userId,
+                                                    @RequestParam(name = "from", defaultValue = "0", required = false) Integer from,
+                                                    @RequestParam(name = "size", defaultValue = "10", required = false) Integer size) {
         log.info("Поступил запрос, на получении списка событий, добавленных пользователем с ИД - {} ", userId);
         final PageRequest pageRequest = OffsetPageRequest.of(from, size);
         return eventService.getEventListByUserId(userId, pageRequest);
@@ -56,10 +55,26 @@ public class EventController {
     @ResponseStatus(HttpStatus.OK)
     public EventFullDTO updateEventByUserIdAndEventId(@PathVariable(name = "userId") Long userId,
                                                       @PathVariable(name = "eventId") Long eventId,
-                                                      @RequestBody UserUpdateEventRequestDto userUpdateEventRequestDto) {
+                                                      @Valid @RequestBody UserUpdateEventRequestDto userUpdateEventRequestDto) {
         log.info("Поступил запрос на изменения события с ID - {} , пользователя с ID - {}", eventId, userId);
         return eventService.updateEventByUserIdAndEventId(userId, eventId, userUpdateEventRequestDto);
     }
 
+    @GetMapping("/{userId}/events/{eventId}/requests")
+    @ResponseStatus(HttpStatus.OK)
+    public List<ParticipationRequestDto> getRequestByCurrentUserEvents(@PathVariable(name = "userId") Long userId,
+                                                                       @PathVariable(name = "eventId") Long eventId) {
+        log.info("Поступил запрос, на получение информации о запросах на участие в событии текущего пользователя");
+        return eventService.getRequestByCurrentUserEvents(userId, eventId);
+    }
+
+    @PatchMapping("/{userId}/events/{eventId}/requests")
+    @ResponseStatus(HttpStatus.OK)
+    public EventRequestStatusUpdateResultDto updateRequestStatusByCurrentUserEvents(@PathVariable(name = "userId") Long userId,
+                                                                                    @PathVariable(name = "eventId") Long eventId,
+                                                                                    @Valid @RequestBody EventRequestStatusUpdateRequestDto eventRequestStatusUpdateRequestDto) {
+        log.info("Поступил запрос, на изменение статуса (подтверждена, отменена) заявок на участие в событии текущего пользователя");
+        return eventService.updateRequestStatusByCurrentUserEvents(userId, eventId, eventRequestStatusUpdateRequestDto);
+    }
 
 }

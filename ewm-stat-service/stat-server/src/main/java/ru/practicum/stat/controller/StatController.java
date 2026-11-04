@@ -27,12 +27,11 @@ public class StatController {
         this.statService = statService;
     }
 
-    @PostMapping(value = "hit", produces = "text/plain;charset=UTF-8")
+    @PostMapping("hit")
     @ResponseStatus(HttpStatus.CREATED)
-    public String createStat(@RequestBody @Valid HitDto hitDto) {
+    public void createStat(@RequestBody @Valid HitDto hitDto) {
         log.info("Поступил запрос на создание записи в статистике - {}", hitDto);
         statService.createStat(hitDto);
-        return "Информация сохранена";
     }
 
     @GetMapping("stats")

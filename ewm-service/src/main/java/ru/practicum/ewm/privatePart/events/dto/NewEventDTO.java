@@ -38,14 +38,14 @@ public class NewEventDTO {
     private LocalDateTime eventDate;
 
     @JsonProperty(defaultValue = "false")
-    private Boolean paid;
+    private Boolean paid = false;
 
     @JsonProperty(defaultValue = "0")
-    @Min(1)
-    private Integer participantLimit;
+    @Min(0)
+    private Integer participantLimit = 0;
 
     @JsonProperty(defaultValue = "true")
-    private Boolean requestModeration;
+    private Boolean requestModeration = true;
 
     @NotBlank
     @Length(max = 120, min = 3)
