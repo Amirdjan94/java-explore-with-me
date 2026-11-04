@@ -2,6 +2,7 @@ package client;
 
 import dto.StatsDto;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -22,9 +23,10 @@ import java.util.Map;
 public class StatClient {
     protected final RestTemplate rest;
 
-    public StatClient() {
+    public StatClient(@Value("${stats.server.url:http://localhost:9090}") String statsServerUrl) {
+        log.info("STATS SERVER URL = {}", statsServerUrl);
         rest = new RestTemplateBuilder()
-                .uriTemplateHandler(new DefaultUriBuilderFactory("http://localhost:9090"))
+                .uriTemplateHandler(new DefaultUriBuilderFactory(statsServerUrl))
                 .requestFactory(() -> new HttpComponentsClientHttpRequestFactory())
                 .build();
     }
@@ -33,8 +35,31 @@ public class StatClient {
         return makeAndSendListRequest(HttpMethod.GET, "stats", parameters, null);
     }
 
-    public <T> ResponseEntity<Object> createStat(T body) {
-        return makeAndSendRequest(HttpMethod.POST, "hit", null, body);
+    public <T> void createStat(T body) {
+        HttpEntity<T> requestEntity =
+                new HttpEntity<>(body, defaultHeaders());
+
+        try {
+            ResponseEntity<Void> response = rest.exchange(
+                    "hit",
+                    HttpMethod.POST,
+                    requestEntity,
+                    Void.class
+            );
+
+            log.info("Статистика отправлена. Статус ответа: {}",
+                    response.getStatusCode());
+
+        } catch (HttpStatusCodeException e) {
+            log.error("Ошибка отправки статистики: status={}, body={}",
+                    e.getStatusCode(),
+                    e.getResponseBodyAsString());
+            throw e;
+
+        } catch (org.springframework.web.client.RestClientException e) {
+            log.error("Ошибка при обращении к stats-server", e);
+            throw e;
+        }
     }
 
     private <T> ResponseEntity<List<StatsDto>> makeAndSendListRequest(HttpMethod method, String path, @Nullable Map<String,
@@ -67,27 +92,10 @@ public class StatClient {
         return prepareResponse(statServerResponse);
     }
 
-    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, @Nullable Map<String,
-            Object> parameters, @Nullable T body) {
-        HttpEntity<T> requestEntity = new HttpEntity<>(body, defaultHeaders());
-
-        ResponseEntity<Object> statServerResponse;
-        try {
-            if (parameters != null) {
-                statServerResponse = rest.exchange(path, method, requestEntity, Object.class, parameters);
-            } else {
-                statServerResponse = rest.exchange(path, method, requestEntity, Object.class);
-            }
-        } catch (HttpStatusCodeException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
-        }
-        return prepareResponse(statServerResponse);
-    }
-
     private HttpHeaders defaultHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setAccept(List.of(MediaType.ALL));
         return headers;
     }
 
