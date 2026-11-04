@@ -185,8 +185,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public EventRequestStatusUpdateResultDto updateRequestStatusByCurrentUserEvents
-            (Long userId, Long eventId, EventRequestStatusUpdateRequestDto eventRequestStatusUpdateRequestDto) {
+    public EventRequestStatusUpdateResultDto updateRequestStatusByCurrentUserEvents(Long userId, Long eventId, EventRequestStatusUpdateRequestDto eventRequestStatusUpdateRequestDto) {
         log.info("Проверяем наличие пользователя в БД с ID - {} ", userId);
         checkUserIdAndGetUserEntity(userId);
         log.info("Проверяем наличие события в БД с ID - {} ", eventId);

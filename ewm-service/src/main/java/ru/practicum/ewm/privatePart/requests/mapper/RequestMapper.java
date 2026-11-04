@@ -39,9 +39,8 @@ public class RequestMapper {
         return participationRequestDto;
     }
 
-    public static EventRequestStatusUpdateResultDto toEventRequestStatusUpdateResultDtoFromRequestListEntity
-            (List<Request> confirmedRequestList,
-             List<Request> rejectedRequestList) {
+    public static EventRequestStatusUpdateResultDto toEventRequestStatusUpdateResultDtoFromRequestListEntity(List<Request> confirmedRequestList,
+                                                                                                             List<Request> rejectedRequestList) {
         EventRequestStatusUpdateResultDto eventRequestStatusUpdateResultDto = new EventRequestStatusUpdateResultDto();
         eventRequestStatusUpdateResultDto.setConfirmedRequests(confirmedRequestList.stream()
                 .map(RequestMapper::toParticipationRequestDtoFromRequestEntity)
