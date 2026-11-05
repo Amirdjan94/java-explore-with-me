@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.admin.users.model.User;
 import ru.practicum.ewm.admin.users.repository.UserRepository;
 import ru.practicum.ewm.exception.ConditionsNotMetException;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 public class RequestServiceImpl implements RequestService {
 
     private EventRepository eventRepository;
@@ -38,6 +40,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public ParticipationRequestDto createParticipationRequest(Long userId, Long eventId) {
         log.info("Проверяем наличие пользователя в БД с ID - {} ", userId);
         User user = checkUserIdAndGetUserEntity(userId);
@@ -63,6 +66,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public ParticipationRequestDto canceledRequest(Long userId, Long requestId) {
         log.info("Проверяем наличие пользователя в БД с ID - {} ", userId);
         checkUserIdAndGetUserEntity(userId);

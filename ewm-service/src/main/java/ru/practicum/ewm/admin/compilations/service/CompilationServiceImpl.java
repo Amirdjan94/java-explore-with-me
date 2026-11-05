@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.admin.compilations.dto.CompilationDto;
 import ru.practicum.ewm.admin.compilations.dto.NewCompilationDto;
 import ru.practicum.ewm.admin.compilations.dto.UpdateCompilationDto;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 public class CompilationServiceImpl implements CompilationService {
     private CompilationRepository compilationRepository;
     private EventRepository eventRepository;
@@ -47,6 +49,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional
     public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
 
         log.info("Собираем список событий");
@@ -72,6 +75,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional
     public void deleteCompilation(Long compId) {
         log.info("Проверяем наличие подборки события в БД с ID - {} ", compId);
         checkExistCompilationAndGetCompEntity(compId);
@@ -80,6 +84,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
+    @Transactional
     public CompilationDto updateCompilation(Long compId, UpdateCompilationDto updateCompilationDto) {
 
         log.info("Проверяем наличие подборки события в БД с ID - {} ", compId);
@@ -137,7 +142,12 @@ public class CompilationServiceImpl implements CompilationService {
         log.info("Формируем список подборок");
         List<CompilationDto> compilationDtoList = compilationPage.get().map((compilation) ->
                         CompilationMapper.toCompilationDtoFromCompilationEntity(compilation,
-                                eventShortDTOList.stream().filter((el) -> compilation.getEvents().contains(el.getId()))
+                                eventShortDTOList.stream().filter((el) -> // Далее получаем лист ID-ков event
+                                                compilation.getEvents()
+                                                        .stream()
+                                                        .map(Event::getId)
+                                                        .toList()
+                                                        .contains(el.getId())) // Тут уже проверяем условие
                                         .collect(Collectors.toList())))
                 .collect(Collectors.toList());
 

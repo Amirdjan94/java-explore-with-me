@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.admin.users.dto.NewUserDto;
 import ru.practicum.ewm.admin.users.dto.UserDto;
 import ru.practicum.ewm.admin.users.mapper.UserMapper;
@@ -20,6 +21,7 @@ import static ru.practicum.ewm.admin.users.mapper.UserMapper.toUserDtoFromUser;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
@@ -29,6 +31,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto createUser(NewUserDto newUserDto) {
         User user = UserMapper.toUserFromNewUserDto(newUserDto);
         User newUser = userRepository.save(user);
@@ -37,6 +40,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteUserById(Long userId) {
         log.info("Проверяем наличие пользователя в БД с ID - {} ", userId);
         Optional<User> user = userRepository.findById(userId);

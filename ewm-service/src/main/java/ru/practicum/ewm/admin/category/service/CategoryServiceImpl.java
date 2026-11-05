@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.admin.category.dto.CategoryDto;
 import ru.practicum.ewm.admin.category.dto.NewCategoryDto;
 import ru.practicum.ewm.admin.category.mapper.CategoryMapper;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 public class CategoryServiceImpl implements CategoryService {
     CategoryRepository categoryRepository;
 
@@ -26,6 +28,7 @@ public class CategoryServiceImpl implements CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
+    @Transactional
     @Override
     public CategoryDto createCategory(NewCategoryDto newCategoryDto) {
         Category category = CategoryMapper.toCategoryFromNewCategoryDto(newCategoryDto);
@@ -34,6 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryMapper.toCategoryDtoFromCategory(newCategory);
     }
 
+    @Transactional
     @Override
     public void deleteCategory(Long categoryId) {
         log.info("Проверяем наличие категории в БД с ID - {} ", categoryId);
@@ -42,13 +46,13 @@ public class CategoryServiceImpl implements CategoryService {
         log.info("Удалена категория с ID - {} ", categoryId);
     }
 
+    @Transactional
     @Override
     public CategoryDto updateCategory(Long categoryId, Map<String, String> newNameMap) {
         log.info("Проверяем наличие категории в БД с ID - {} ", categoryId);
-        checkExistCategoryAndGetCategoryEntity(categoryId);
+        Category category = checkExistCategoryAndGetCategoryEntity(categoryId);
         log.info("Проверяем входные данные - {} ", newNameMap);
         checkNewNameMap(newNameMap);
-        Category category = categoryRepository.findById(categoryId).get();
         category.setName(newNameMap.get("name"));
         Category newCategory = categoryRepository.save(category);
         log.info("Обновили данные и сохранили в БД - {} ", newCategory);
@@ -60,6 +64,7 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.findAll(pageRequest).stream().map(CategoryMapper::toCategoryDtoFromCategory)
                 .collect(Collectors.toList());
     }
+
 
     @Override
     public CategoryDto getCategoryById(Long categoryId) {

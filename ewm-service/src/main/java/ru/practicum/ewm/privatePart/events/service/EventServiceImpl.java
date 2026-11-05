@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.admin.category.model.Category;
 import ru.practicum.ewm.admin.category.repository.CategoryRepository;
 import ru.practicum.ewm.admin.events.data.AdminStateAction;
@@ -38,6 +39,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 public class EventServiceImpl implements EventService {
 
     private EventRepository eventRepository;
@@ -59,6 +61,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventFullDTO createEvent(NewEventDTO newEventDTO, Long userId) {
         log.info("Проверяем наличие пользователя в БД с ID - {} ", userId);
         User user = checkUserIdAndGetUserEntity(userId);
@@ -89,6 +92,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventFullDTO updateEventByUserIdAndEventId(Long userId, Long eventId, UserUpdateEventRequestDto userUpdateEventRequestDto) {
         log.info("Проверяем наличие пользователя в БД с ID - {} ", userId);
         checkUserIdAndGetUserEntity(userId);
@@ -130,6 +134,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventFullDTO updateEventByAdmin(AdminUpdateEventRequestDto adminUpdateEventRequestDto, Long eventId) {
         log.info("Проверяем наличие события в БД с ID - {} ", eventId);
         Event event = checkEventIdAndGetEventEntity(eventId);
@@ -185,6 +190,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
+    @Transactional
     public EventRequestStatusUpdateResultDto updateRequestStatusByCurrentUserEvents(Long userId, Long eventId, EventRequestStatusUpdateRequestDto eventRequestStatusUpdateRequestDto) {
         log.info("Проверяем наличие пользователя в БД с ID - {} ", userId);
         checkUserIdAndGetUserEntity(userId);
@@ -394,7 +400,7 @@ public class EventServiceImpl implements EventService {
                         "pending-publication state.");
             }
             if (adminUpdateEventRequestDto.getStateAction().equals(AdminStateAction.PUBLISH_EVENT) &&
-                    LocalDateTime.now().isAfter(event.getEventDate().plusHours(1))) {
+                    LocalDateTime.now().plusHours(1).isAfter(event.getEventDate())) {
                 log.warn("Дата начала изменяемого события должна быть не ранее чем за час от даты публикации");
                 throw new DataIntegrityViolationException("The start date of the event being modified must be no earlier " +
                         "than one hour from the publication date.");
@@ -409,7 +415,7 @@ public class EventServiceImpl implements EventService {
             throw new DataIntegrityViolationException("Only pending or canceled events can be changed");
         }
         if (userUpdateEventRequestDto.getEventDate() != null &&
-                LocalDateTime.now().isAfter(userUpdateEventRequestDto.getEventDate().plusHours(2))) {
+                LocalDateTime.now().plusHours(2).isAfter(userUpdateEventRequestDto.getEventDate())) {
             log.warn("Дата и время на которые намечено событие не может быть раньше, чем через два часа " +
                     "от текущего момента");
             throw new DataIntegrityViolationException("The date and time scheduled for the event cannot be less than " +
