@@ -400,7 +400,7 @@ public class EventServiceImpl implements EventService {
                         "pending-publication state.");
             }
             if (adminUpdateEventRequestDto.getStateAction().equals(AdminStateAction.PUBLISH_EVENT) &&
-                    LocalDateTime.now().plusHours(1).isAfter(event.getEventDate())) {
+                    LocalDateTime.now().isAfter(event.getEventDate().plusHours(1))) {
                 log.warn("Дата начала изменяемого события должна быть не ранее чем за час от даты публикации");
                 throw new DataIntegrityViolationException("The start date of the event being modified must be no earlier " +
                         "than one hour from the publication date.");
@@ -415,7 +415,7 @@ public class EventServiceImpl implements EventService {
             throw new DataIntegrityViolationException("Only pending or canceled events can be changed");
         }
         if (userUpdateEventRequestDto.getEventDate() != null &&
-                LocalDateTime.now().plusHours(2).isAfter(userUpdateEventRequestDto.getEventDate())) {
+                LocalDateTime.now().isAfter(userUpdateEventRequestDto.getEventDate().plusHours(2))) {
             log.warn("Дата и время на которые намечено событие не может быть раньше, чем через два часа " +
                     "от текущего момента");
             throw new DataIntegrityViolationException("The date and time scheduled for the event cannot be less than " +
