@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.stat.service.StatService;
 
 import java.time.LocalDateTime;
@@ -27,12 +28,11 @@ public class StatController {
         this.statService = statService;
     }
 
-    @PostMapping(value = "hit", produces = "text/plain;charset=UTF-8")
+    @PostMapping("hit")
     @ResponseStatus(HttpStatus.CREATED)
-    public String createStat(@RequestBody @Valid HitDto hitDto) {
+    public void createStat(@RequestBody @Valid HitDto hitDto) {
         log.info("Поступил запрос на создание записи в статистике - {}", hitDto);
         statService.createStat(hitDto);
-        return "Информация сохранена";
     }
 
     @GetMapping("stats")
@@ -46,7 +46,13 @@ public class StatController {
                                                    @RequestParam(value = "unique", defaultValue = "false", required = false)
                                                    Boolean unique) {
         log.info("Поступил запрос на получение статистики: start - {}; " +
-                "end - {}; uris - {}; uris - {};", start, end, uris, unique);
+                "end - {}; uris - {}; unique - {};", start, end, uris, unique);
+        if (start.isAfter(end)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Дата начала диапазона не может быть позже даты окончания"
+            );
+        }
         return statService.getAllStatsByParam(start, end, uris, unique);
     }
 

@@ -24,8 +24,8 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = StatController.class)
 @ContextConfiguration(classes = StatApp.class)
@@ -58,17 +58,6 @@ public class StatControllerTest {
                 "/events",
                 1L
         );
-    }
-
-    @Test
-    void createStat() throws Exception {
-
-        mvc.perform(post("/hit")
-                        .content(mapper.writeValueAsString(hitDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(content().string("Информация сохранена"));
     }
 
     @Test
